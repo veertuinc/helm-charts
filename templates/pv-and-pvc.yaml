@@ -1,0 +1,29 @@
+{{ if .Values.registry.volumeClaimUseLocalStorage }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: registry-data
+spec:
+  storageClassName: local-storage
+  capacity:
+    storage: {{ .Values.registry.volumeClaimCapacityStorageSize }}
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/data/registry-data"
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.registry.volumeClaimName}}
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.registry.volumeClaimCapacityStorageSize }}
+  storageClassName: local-storage
+  volumeName: registry-data
+  {{ end }}

@@ -1,0 +1,20 @@
+# Default values for anka-build-cloud.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+controller:
+  version: '1.30.0'
+  replicaCount: 2
+  ANKA_ANKA_REGISTRY:
+  ANKA_ETCD_ENDPOINTS: 'etcd-0.etcd-headless.anka-build-cloud.svc.cluster.local:2379,etcd-1.etcd-headless.anka-build-cloud.svc.cluster.local:2379,etcd-2.etcd-headless.anka-build-cloud.svc.cluster.local:2379'
+  ANKA_LOCAL_ANKA_REGISTRY: 'http://registry.anka-build-cloud.svc.cluster.local:8089'
+  ingressALBHostname: false
+
+registry:
+  version: '1.30.0'
+  replicaCount: 1
+  volumeClaimUseLocalStorage: true
+  volumeClaimName: 'registry-data'
+  volumeClaimCapacityStorageSize: 200Gi
+  ingressALBHostname: false
+
