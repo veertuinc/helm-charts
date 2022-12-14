@@ -13,7 +13,9 @@ controller:
 registry:
   version: '1.30.0'
   replicaCount: 1
-  volumeClaimUseLocalStorage: true
+  volumeClaimUseEFS: false
+  volumeClaimID:
+  volumeClaimUseLocalStorage: false
   volumeClaimName: 'registry-data'
   volumeClaimCapacityStorageSize: 200Gi
   ingressALBHostname: false

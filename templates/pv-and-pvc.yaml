@@ -1,3 +1,33 @@
+{{ if .Values.registry.volumeClaimUseEFS }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: registry-data
+spec:
+  capacity:
+    storage: {{ .Values.registry.volumeClaimCapacityStorageSize }}
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: efs-sc
+  csi:
+    driver: efs.csi.aws.com
+    volumeHandle: {{ required ".registry.volumeClaimFileSystemId value is required and must be the efs FileSystemId!" .Values.registry.volumeClaimFileSystemId }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.registry.volumeClaimName }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: efs-sc
+  resources:
+    requests:
+      storage: {{ .Values.registry.volumeClaimCapacityStorageSize }}
+{{ end }}
+{{ if eq .Values.registry.volumeClaimUseEFS false }}
 {{ if .Values.registry.volumeClaimUseLocalStorage }}
 ---
 apiVersion: v1
@@ -17,7 +47,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Values.registry.volumeClaimName}}
+  name: {{ .Values.registry.volumeClaimName }}
 spec:
   accessModes:
     - ReadWriteMany
@@ -26,4 +56,5 @@ spec:
       storage: {{ .Values.registry.volumeClaimCapacityStorageSize }}
   storageClassName: local-storage
   volumeName: registry-data
-  {{ end }}
+{{ end }}
+{{ end }}
