@@ -2,7 +2,7 @@
 
 ## Synopsis
 
-- By default local-storage is used for the Registry. If the Registry pod is placed on a different node, data will be orphaned and not reachable. This is not a good idea unless you only have a single node kubernetes cluster.
+- By default local-storage is used for the Registry. If the Registry pod is placed on a different node, data will be orphaned on the previous and Anka VM Templates will seem missing. This is not a good idea unless you only have a single node kubernetes cluster. EFS is available as an alternative (see the comments below in the yaml and section "Using EFS") which can be cross-az.
 - 
 
 ## Usage
@@ -19,10 +19,10 @@
         replicaCount: 2
 
         #= Automatically create an AWS ALB requires Kubernetes cluster with AWS Load Balancer Controller: https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/
-        #== Comment out ingressALBHostname if you don't wish to set up the AWS ALB (you will need to deploy your own services)
+        #= Comment out ingressALBHostname if you don't wish to set up the AWS ALB (you will need to deploy your own services)
         ingressALBHostname: controller.k8s.myDomain.com
         #= SG (ID or Name) must be inside of the VPC that's being used by the cluster
-        #== Comment out if you want to automatically create an SG for this ALB
+        #= Comment out if you want to automatically create an SG for this ALB
         ingressALBSecurityGroup: default
 
         #= Change this to a URL your nodes can access
@@ -41,12 +41,11 @@
         #= Change the volumeClaimName if you have your own PV/PVC set up for the registry with a different name (defaults to registry-data)
         # volumeClaimName: 'registry-data'
         # volumeClaimCapacityStorageSize: 200Gi
-
         #= Automatically create an AWS ALB requires Kubernetes cluster with AWS Load Balancer Controller: https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/
-        #== Comment out ingressALBHostname if you don't wish to set up the AWS ALB (you will need to deploy your own services)
+        #= Comment out ingressALBHostname if you don't wish to set up the AWS ALB (you will need to deploy your own services)
         ingressALBHostname: registry.k8s.myDomain.com
         #= SG (ID or Name) must be inside of the VPC that's being used by the cluster
-        #== Comment out if you want to automatically create an SG for this ALB
+        #= Comment out if you want to automatically create an SG for this ALB
         ingressALBSecurityGroup: default
     ```
 
@@ -66,6 +65,48 @@
 
 4. Change your `controller.k8s.myDomain.com` and `controller.k8s.myDomain.com` to point to the ALB that was set up for each (AWS > EC2 > Target Groups).
 
-### EFS
+### Using EFS
 
-To use EFS, you need to go through instructions in https://docs.aws.amazon.com/eks/latest/userguide/efs-csi.html. Then, once 
+To use EFS, you need to go through instructions in https://docs.aws.amazon.com/eks/latest/userguide/efs-csi.html. Then, once set up in kubernetes, create the EFS, mount targets for the various AZs, and finally your storageClass for it. Here is an example of how to script this (changing `CLUSTER_NAME` and anything else):
+
+```bash
+CLUSTER_NAME="k8s.myDomain.com"
+VPC_ID="$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=${CLUSTER_NAME}" | grep VpcId | grep -Eo '[^:]*$' | sed 's/"//g' | sed 's/,//g' | xargs)"
+DEFAULT_SG_ID="$(aws ec2 describe-security-groups --filter "Name=vpc-id,Values=${VPC_ID}" "Name=group-name,Values=default" | grep GroupId | tail -1 | grep -Eo '[^:]*$' | sed 's/"//g' | sed 's/,//g' | xargs)"
+# install aws-fs-csi-driver
+kubectl apply -k "github.com/kubernetes-sigs/aws-efs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.3"
+# add node SG to default cluster SG
+NODES_SG_ID="$(aws ec2 describe-security-groups --filter "Name=group-name,Values=nodes.${CLUSTER_NAME}" --query "SecurityGroups[0].GroupId" --output text)"
+aws ec2 authorize-security-group-ingress --group-id "${DEFAULT_SG_ID}" --protocol tcp --port 2049 --source-group "${NODES_SG_ID}"
+# create or get existing EFS ID
+if ! aws efs describe-file-systems | grep anka-build-cloud >/dev/null; then
+  FS_ID=$(aws efs create-file-system --performance-mode generalPurpose --throughput-mode bursting \
+    --tags Key=Name,Value=anka-build-cloud --query "FileSystemId" --output text)
+else
+  FS_ID="$(aws efs describe-file-systems --query "FileSystems[?Name=='anka-build-cloud'].FileSystemId" --output text)"
+  for MT_ID in $(aws efs describe-mount-targets --file-system-id "${FS_ID}" --query "MountTargets[].MountTargetId" --output text); do
+    aws efs delete-mount-target --mount-target-id "${MT_ID}"
+  done
+fi
+sleep 20
+# create mount targets for each AZ/subnet
+for SN_ID in $(aws ec2 describe-subnets \
+  --filters "Name=tag:KubernetesCluster,Values=${CLUSTER_NAME}" \
+  --query "Subnets[].SubnetId" --output text); do 
+  echo "SUBNET ID: ${SN_ID}"
+  aws efs create-mount-target --file-system-id "${FS_ID}" --subnet-id "${SN_ID}" --security-groups "${DEFAULT_SG_ID}"
+done
+while [[ "$(aws efs describe-mount-targets --file-system-id ${FS_ID} --query "MountTargets[0].LifeCycleState" --output text)" == 'creating' ]]; do
+  echo "mount target for efs still creating..."
+  sleep 10
+done
+# create EFS StorageClass
+cat << EOF > efs-storageclass.yaml
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: efs-sc
+provisioner: efs.csi.aws.com
+EOF
+kubectl apply -f ./efs-storageclass.yaml
+```
