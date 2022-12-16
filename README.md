@@ -1,9 +1,8 @@
 # Anka Build Cloud Helm Chart for AWS
 
-## Synopsis
+## Before You Begin
 
 - By default local-storage is used for the Registry. If the Registry pod is placed on a different node, data will be orphaned on the previous and Anka VM Templates will seem missing. This is not a good idea unless you only have a single node kubernetes cluster. EFS is available as an alternative (see the comments below in the yaml and section "Using EFS") which can be cross-az.
-- 
 
 ## Usage
 
@@ -17,14 +16,15 @@
       controller:
         # version: '1.30.0'
         replicaCount: 2
-
+        #
         #= Automatically create an AWS ALB requires Kubernetes cluster with AWS Load Balancer Controller: https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/
         #= Comment out ingressALBHostname if you don't wish to set up the AWS ALB (you will need to deploy your own services)
         ingressALBHostname: controller.k8s.myDomain.com
+        #
         #= SG (ID or Name) must be inside of the VPC that's being used by the cluster
         #= Comment out if you want to automatically create an SG for this ALB
         ingressALBSecurityGroup: default
-
+        #
         #= Change this to a URL your nodes can access
         ANKA_ANKA_REGISTRY: http://registry.k8s.myDomain.com:8089
         # ANKA_ETCD_ENDPOINTS: 'etcd-0.etcd-headless.anka-build-cloud.svc.cluster.local:2379,etcd-1.etcd-headless.anka-build-cloud.svc.cluster.local:2379,etcd-2.etcd-headless.anka-build-cloud.svc.cluster.local:2379'
@@ -33,17 +33,22 @@
       registry:
         # version: '1.30.0'
         # replicaCount: 1 #= don't use more than 1 unless you have some sort of network storage that the entire cluster can access, no matter where the registry pods are.
+        #
         #= Set volumeClaimUseLocalStorage to false (or comment out) if you already have a volume available (you'll need your own pvc for it too)
         volumeClaimUseLocalStorage: true
+        #
         #= Use EFS to handle multi-node clusters and HA for Registry (requires that https://docs.aws.amazon.com/eks/latest/userguide/efs-csi.html is setup)
         # volumeClaimUseEFS: true
         # volumeClaimFileSystemId: fs-XXXXXXXXXXXXX
+        #
         #= Change the volumeClaimName if you have your own PV/PVC set up for the registry with a different name (defaults to registry-data)
         # volumeClaimName: 'registry-data'
         # volumeClaimCapacityStorageSize: 200Gi
+        #
         #= Automatically create an AWS ALB requires Kubernetes cluster with AWS Load Balancer Controller: https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/
         #= Comment out ingressALBHostname if you don't wish to set up the AWS ALB (you will need to deploy your own services)
         ingressALBHostname: registry.k8s.myDomain.com
+        #
         #= SG (ID or Name) must be inside of the VPC that's being used by the cluster
         #= Comment out if you want to automatically create an SG for this ALB
         ingressALBSecurityGroup: default
@@ -71,8 +76,9 @@ To use EFS, you need to go through instructions in https://docs.aws.amazon.com/e
 
 ```bash
 CLUSTER_NAME="k8s.myDomain.com"
+DEFAULT_K8S_SG_NAME="default"
 VPC_ID="$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=${CLUSTER_NAME}" | grep VpcId | grep -Eo '[^:]*$' | sed 's/"//g' | sed 's/,//g' | xargs)"
-DEFAULT_SG_ID="$(aws ec2 describe-security-groups --filter "Name=vpc-id,Values=${VPC_ID}" "Name=group-name,Values=default" | grep GroupId | tail -1 | grep -Eo '[^:]*$' | sed 's/"//g' | sed 's/,//g' | xargs)"
+DEFAULT_SG_ID="$(aws ec2 describe-security-groups --filter "Name=vpc-id,Values=${VPC_ID}" "Name=group-name,Values=${DEFAULT_K8S_SG_NAME}" | grep GroupId | tail -1 | grep -Eo '[^:]*$' | sed 's/"//g' | sed 's/,//g' | xargs)"
 # install aws-fs-csi-driver
 kubectl apply -k "github.com/kubernetes-sigs/aws-efs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.3"
 # add node SG to default cluster SG
