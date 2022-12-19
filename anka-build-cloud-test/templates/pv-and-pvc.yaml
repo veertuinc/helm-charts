@@ -1,0 +1,91 @@
+{{ if .Values.registry.volumeClaimUseEFS }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: registry-data
+spec:
+  capacity:
+    storage: {{ .Values.registry.volumeClaimCapacityStorageSize }}
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: efs-sc
+  csi:
+    driver: efs.csi.aws.com
+    volumeHandle: {{ required ".registry.volumeClaimFileSystemId value is required and must be the efs FileSystemId!" .Values.registry.volumeClaimFileSystemId }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.registry.volumeClaimName }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: efs-sc
+  resources:
+    requests:
+      storage: {{ .Values.registry.volumeClaimCapacityStorageSize }}
+{{ end }}
+{{ if eq .Values.registry.volumeClaimUseEFS false }}
+{{ if .Values.registry.volumeClaimUseLocalStorage }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: registry-data
+spec:
+  storageClassName: local-storage
+  capacity:
+    storage: {{ .Values.registry.volumeClaimCapacityStorageSize }}
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/data/registry-data"
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.registry.volumeClaimName }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.registry.volumeClaimCapacityStorageSize }}
+  storageClassName: local-storage
+  volumeName: registry-data
+{{ end }}
+{{ end }}
+{{ if .Values.etcd.enabled }}
+{{ if .Values.etcd.volumeClaimUseLocalStorage }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: etcd-data
+spec:
+  storageClassName: local-storage
+  capacity:
+    storage: {{ .Values.etcd.volumeClaimCapacityStorageSize }}
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/data/etcd-data"
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.etcd.volumeClaimName }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.etcd.volumeClaimCapacityStorageSize }}
+  storageClassName: local-storage
+  volumeName: etcd-data
+{{ end }}
+{{ end }}
