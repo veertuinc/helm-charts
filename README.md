@@ -87,7 +87,7 @@ kubectl apply -f namespace.yaml
 
     To install the anka-build-cloud chart:
 
-        helm upgrade -i -f anka-build-cloud.yaml anka-build-cloud anka-build-cloud
+        helm upgrade -i --namespace anka-build-cloud -f anka-build-cloud.yaml anka-build-cloud
 
     To uninstall the chart:
 
