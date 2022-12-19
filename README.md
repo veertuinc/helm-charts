@@ -11,16 +11,16 @@
 
 1. Create namespace:
 
-```bash
-cat << BLOCK > namespace.yaml
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: anka-build-cloud
-BLOCK
-kubectl apply -f namespace.yaml
-```
+    ```bash
+    cat << BLOCK > namespace.yaml
+    ---
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: anka-build-cloud
+    BLOCK
+    kubectl apply -f namespace.yaml
+    ```
 
 1. Create `anka-build-cloud.yaml`
 
