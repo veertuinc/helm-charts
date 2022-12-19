@@ -96,7 +96,7 @@ spec:
           ports:
             - containerPort: 2379
           volumeMounts:
-            - mountPath: /mnt/vol
+            - mountPath: /etcd-data
               name: etcd-data
           env:
             - name: ETCD_QUOTA_BACKEND_BYTES
