@@ -80,3 +80,18 @@ spec:
                 port:
                   number: 8089
 {{ end }}
+{{ if .Values.etcd.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: etcd-headless
+spec:
+  clusterIP: None
+  selector:
+    app: etcd
+  ports:
+    - protocol: TCP
+      port: 2379
+      targetPort: 2379
+{{ end }}

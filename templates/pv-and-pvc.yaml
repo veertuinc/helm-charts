@@ -58,3 +58,34 @@ spec:
   volumeName: registry-data
 {{ end }}
 {{ end }}
+{{ if .Values.etcd.enabled }}
+{{ if .Values.etcd.volumeClaimUseLocalStorage }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: etcd-data
+spec:
+  storageClassName: local-storage
+  capacity:
+    storage: {{ .Values.etcd.volumeClaimCapacityStorageSize }}
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/data/etcd-data"
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.etcd.volumeClaimName }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.etcd.volumeClaimCapacityStorageSize }}
+  storageClassName: local-storage
+  volumeName: etcd-data
+{{ end }}
+{{ end }}
