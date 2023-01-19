@@ -121,6 +121,17 @@ spec:
               value: "1m"
             - name: ETCD_NAME
               value: "my-etcd"
+      {{ if .Values.etcd.nodeAffinityKey }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: {{ .Values.etcd.nodeAffinityKey }}
+                  operator: In
+                  values:
+                    - {{ required ".etcd.nodeAffinityValue value is required!" .Values.etcd.nodeAffinityValue }}
+      {{ end }}
       restartPolicy: Always
       volumes:
         - name: etcd-data

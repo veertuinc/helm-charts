@@ -28,7 +28,7 @@
       # Note: You cannot leave a section empty; Comment out "controller:" or "registry:" if everything under it is also commented out.
 
       controller:
-        version: '1.30.0'
+        version: '1.31.1'
         replicaCount: 3
         #
         #= Automatically create an AWS ALB requires Kubernetes cluster with AWS Load Balancer Controller: https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/
@@ -47,7 +47,7 @@
         # ANKA_ENABLE_CENTRAL_LOGGING: true
 
       registry:
-        version: '1.30.0'
+        version: '1.31.1'
         replicaCount: 1 # don't use more than 1 unless you have some sort of network storage that the entire cluster can access, no matter where the registry pods are.
         #
         #= Set volumeClaimUseLocalStorage to false (or comment out) if you already have a volume available (you'll need your own pvc for it too)
@@ -70,13 +70,16 @@
         ingressALBSecurityGroup: default
 
       etcd:
-        version: '1.30.0'
+        version: '1.31.1'
         #= Whether or not to run a single pod with etcd in it. Disable this if you are running an etcd cluster already.
         enabled: true
         volumeClaimUseLocalStorage: true
         volumeClaimName: 'etcd-data'
         volumeClaimCapacityStorageSize: 10Gi
         ETCD_QUOTA_BACKEND_BYTES: '6294967296' # must be a string
+        #= Ensure the pod can't be rescheduled on another node where the local storage doesn't exist (which will cause loss of VMs, groups, and auth keys in the Controller)
+        nodeAffinityKey: 'topology.kubernetes.io/zone'
+        nodeAffinityValue: 'us-west-2a'
     ```
 
 2. Once Helm has been set up correctly, add the repo as follows:

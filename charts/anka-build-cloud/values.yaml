@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 
 controller:
-  version: '1.30.0'
+  version: '1.31.1'
   replicaCount: 2
   ANKA_ANKA_REGISTRY:
   ANKA_ETCD_ENDPOINTS: 'etcd-headless.anka-build-cloud.svc.cluster.local:2379'
@@ -13,7 +13,7 @@ controller:
   ANKA_ENABLE_CENTRAL_LOGGING: true
 
 registry:
-  version: '1.30.0'
+  version: '1.31.1'
   replicaCount: 1
   volumeClaimUseEFS: false
   volumeClaimID:
@@ -24,9 +24,10 @@ registry:
 
 etcd:
   enabled: true
-  version: '1.30.0'
+  version: '1.31.1'
   volumeClaimUseLocalStorage: true
   volumeClaimName: 'etcd-data'
   volumeClaimCapacityStorageSize: 10Gi
   ETCD_QUOTA_BACKEND_BYTES: '6294967296'
-  
+  # nodeAffinityKey: 'topology.kubernetes.io/zone'
+  # nodeAffinityValue: 'us-west-2a'
