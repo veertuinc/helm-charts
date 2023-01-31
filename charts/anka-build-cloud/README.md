@@ -25,9 +25,10 @@
 1. Create `anka-build-cloud.yaml`
 
     ```yaml
-      # Note: You cannot leave a section empty; Comment out "controller:" or "registry:" if everything under it is also commented out.
+      # Note: You cannot leave a section empty. To disable a service, comment out everything but the service name line and "enabled" which is set to false
 
       controller:
+        enabled: true
         version: '1.31.1'
         replicaCount: 3
         #
@@ -47,6 +48,7 @@
         # ANKA_ENABLE_CENTRAL_LOGGING: true
 
       registry:
+        enabled: true
         version: '1.31.1'
         replicaCount: 1 # don't use more than 1 unless you have some sort of network storage that the entire cluster can access, no matter where the registry pods are.
         #

@@ -1,4 +1,5 @@
 ---
+{{ if .Values.controller.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -34,7 +35,9 @@ spec:
             - name: ANKA_ENABLE_CENTRAL_LOGGING
               value: {{ quote .Values.controller.ANKA_ENABLE_CENTRAL_LOGGING }}
       restartPolicy: Always
+{{ end }}
 ---
+{{ if .Values.registry.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -68,8 +71,9 @@ spec:
         - name: registry-data
           persistentVolumeClaim:
             claimName: {{ required ".registry.volumeClaimName value is required!" .Values.registry.volumeClaimName }}
-{{ if .Values.etcd.enabled }}
+{{ end }}
 ---
+{{ if .Values.etcd.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
