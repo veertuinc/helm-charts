@@ -4,7 +4,8 @@
 
 controller:
   enabled: true
-  version: '1.31.1'
+  version: '1.32.0'
+  image: 'veertu/anka-build-cloud-controller'
   replicaCount: 2
   ANKA_ANKA_REGISTRY:
   ANKA_ETCD_ENDPOINTS: 'etcd-headless.anka-build-cloud.svc.cluster.local:2379'
@@ -15,7 +16,8 @@ controller:
 
 registry:
   enabled: true
-  version: '1.31.1'
+  version: '1.32.0'
+  image: 'veertu/anka-build-cloud-registry'
   replicaCount: 1
   volumeClaimUseEFS: false
   volumeClaimID:
@@ -26,7 +28,8 @@ registry:
 
 etcd:
   enabled: true
-  version: '1.31.1'
+  version: '1.32.0'
+  image: 'veertu/anka-build-cloud-etcd'
   volumeClaimUseLocalStorage: true
   volumeClaimName: 'etcd-data'
   volumeClaimCapacityStorageSize: 10Gi

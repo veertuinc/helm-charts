@@ -29,7 +29,8 @@
 
       controller:
         enabled: true
-        version: '1.31.1'
+        version: '1.32.0'
+        # image: 'veertu/anka-build-cloud-controller'
         replicaCount: 3
         #
         #= Automatically create an AWS ALB requires Kubernetes cluster with AWS Load Balancer Controller: https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/
@@ -49,7 +50,8 @@
 
       registry:
         enabled: true
-        version: '1.31.1'
+        version: '1.32.0'
+        # image: 'veertu/anka-build-cloud-registry'
         replicaCount: 1 # don't use more than 1 unless you have some sort of network storage that the entire cluster can access, no matter where the registry pods are.
         #
         #= Set volumeClaimUseLocalStorage to false (or comment out) if you already have a volume available (you'll need your own pvc for it too)
@@ -72,7 +74,8 @@
         ingressALBSecurityGroup: default
 
       etcd:
-        version: '1.31.1'
+        version: '1.32.0'
+        # #image: 'veertu/anka-build-cloud-etcd'
         #= Whether or not to run a single pod with etcd in it. Disable this if you are running an etcd cluster already.
         enabled: true
         volumeClaimUseLocalStorage: true

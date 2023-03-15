@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: controller
-          image: veertu/anka-build-cloud-controller:v{{ .Values.controller.version }}
+          image: {{ .Values.controller.image }}:v{{ .Values.controller.version }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
@@ -59,7 +59,7 @@ spec:
     spec:
       containers:
         - name: registry
-          image: veertu/anka-build-cloud-registry:v{{ .Values.registry.version }}
+          image: {{ .Values.registry.image }}:v{{ .Values.registry.version }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8089
@@ -95,7 +95,7 @@ spec:
     spec:
       containers:
         - name: etcd
-          image: veertu/anka-build-cloud-etcd:v{{ .Values.etcd.version }}
+          image: {{ .Values.etcd.image }}:v{{ .Values.etcd.version }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 2379
