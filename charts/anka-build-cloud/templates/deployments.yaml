@@ -25,15 +25,18 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
+          {{- if .Values.controller.env }}
           env:
-            - name: ANKA_ANKA_REGISTRY
-              value: {{ required ".controller.ANKA_ANKA_REGISTRY value is required!" .Values.controller.ANKA_ANKA_REGISTRY  }}
-            - name: ANKA_LOCAL_ANKA_REGISTRY
-              value: {{ .Values.controller.ANKA_LOCAL_ANKA_REGISTRY }}
-            - name: ANKA_ETCD_ENDPOINTS
-              value: {{ .Values.controller.ANKA_ETCD_ENDPOINTS }}
-            - name: ANKA_ENABLE_CENTRAL_LOGGING
-              value: {{ quote .Values.controller.ANKA_ENABLE_CENTRAL_LOGGING }}
+          {{- range (splitList "\n" .Values.controller.env) }}
+            {{ . }}
+          {{- end }}
+          {{- end }}
+          {{- if .Values.controller.volumeMounts }}
+          volumeMounts:
+          {{- range (splitList "\n" .Values.registry.volumeMounts) }}
+            {{ . }}
+          {{- end }}
+          {{- end }}
       restartPolicy: Always
 {{ end }}
 ---
@@ -63,9 +66,20 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8089
+          {{- if .Values.registry.env }}
+          env:
+          {{- range (splitList "\n" .Values.registry.env) }}
+            {{ . }}
+          {{- end }}
+          {{- end }}
           volumeMounts:
             - mountPath: /mnt/vol
               name: registry-data
+          {{- if .Values.registry.volumeMounts }}
+          {{- range (splitList "\n" .Values.registry.volumeMounts) }}
+            {{ . }}
+          {{- end }}
+          {{- end }}
       restartPolicy: Always
       volumes:
         - name: registry-data
@@ -99,33 +113,21 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 2379
+        {{- if .Values.etcd.env }}
+          env:
+          {{- range (splitList "\n" .Values.etcd.env) }}
+            {{ . }}
+          {{- end }}
+        {{- end }}
           volumeMounts:
             - mountPath: /etcd-data
               name: etcd-data
-          env:
-            - name: ETCD_QUOTA_BACKEND_BYTES
-              value: {{ quote .Values.etcd.ETCD_QUOTA_BACKEND_BYTES }}
-            - name: ETCD_DATA_DIR
-              value: "/etcd-data"
-            - name: ETCD_LISTEN_CLIENT_URLS
-              value: "http://0.0.0.0:2379"
-            - name: ETCD_ADVERTISE_CLIENT_URLS
-              value: "http://0.0.0.0:2379"
-            - name: ETCD_LISTEN_PEER_URLS
-              value: "http://0.0.0.0:2380"
-            - name: ETCD_INITIAL_ADVERTISE_PEER_URLS
-              value: "http://0.0.0.0:2380"
-            - name: ETCD_INITIAL_CLUSTER
-              value: "my-etcd=http://0.0.0.0:2380"
-            - name: ETCD_INITIAL_CLUSTER_TOKEN
-              value: "my-etcd-token"
-            - name: ETCD_INITIAL_CLUSTER_STATE
-              value: "new"
-            - name: ETCD_AUTO_COMPACTION_RETENTION
-              value: "1m"
-            - name: ETCD_NAME
-              value: "my-etcd"
-      {{ if .Values.etcd.nodeAffinityKey }}
+          {{- if .Values.registry.volumeMounts }}
+          {{- range (splitList "\n" .Values.etcd.volumeMounts) }}
+            {{ . }}
+          {{- end }}
+          {{- end }}
+      {{- if .Values.etcd.nodeAffinityKey }}
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -135,7 +137,7 @@ spec:
                   operator: In
                   values:
                     - {{ required ".etcd.nodeAffinityValue value is required!" .Values.etcd.nodeAffinityValue }}
-      {{ end }}
+      {{- end }}
       restartPolicy: Always
       volumes:
         - name: etcd-data

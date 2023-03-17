@@ -19,10 +19,10 @@ metadata:
   annotations: # https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/guide/ingress/annotations/#manage-backend-security-group-rules
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
-    {{ if .Values.controller.ingressALBSecurityGroup }}
+    {{- if .Values.controller.ingressALBSecurityGroup }}
     alb.ingress.kubernetes.io/security-groups: {{ .Values.controller.ingressALBSecurityGroup }}
     alb.ingress.kubernetes.io/manage-backend-security-group-rules: "true"
-    {{ end }}
+    {{- end }}
     alb.ingress.kubernetes.io/tags: Name={{ .Release.Name }}
 spec:
   ingressClassName: alb
@@ -61,10 +61,10 @@ metadata:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 8089}]'
-    {{ if .Values.registry.ingressALBSecurityGroup }}
+    {{- if .Values.registry.ingressALBSecurityGroup }}
     alb.ingress.kubernetes.io/security-groups: {{ .Values.registry.ingressALBSecurityGroup }}
     alb.ingress.kubernetes.io/manage-backend-security-group-rules: "true"
-    {{ end }}
+    {{- end }}
     alb.ingress.kubernetes.io/tags: Name={{ .Release.Name }}
 spec:
   ingressClassName: alb
