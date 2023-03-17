@@ -4,19 +4,14 @@
 
 controller:
   enabled: true
-  version: '1.32.0'
+  version: '1.33.0'
   image: 'veertu/anka-build-cloud-controller'
   replicaCount: 2
-  ANKA_ANKA_REGISTRY:
-  ANKA_ETCD_ENDPOINTS: 'etcd-headless.anka-build-cloud.svc.cluster.local:2379'
-  # ANKA_ETCD_ENDPOINTS: 'etcd-0.etcd-headless.anka-build-cloud.svc.cluster.local:2379,etcd-1.etcd-headless.anka-build-cloud.svc.cluster.local:2379,etcd-2.etcd-headless.anka-build-cloud.svc.cluster.local:2379'
-  ANKA_LOCAL_ANKA_REGISTRY: 'http://registry.anka-build-cloud.svc.cluster.local:8089'
   ingressALBHostname: false
-  ANKA_ENABLE_CENTRAL_LOGGING: true
 
 registry:
   enabled: true
-  version: '1.32.0'
+  version: '1.33.0'
   image: 'veertu/anka-build-cloud-registry'
   replicaCount: 1
   volumeClaimUseEFS: false
@@ -28,11 +23,10 @@ registry:
 
 etcd:
   enabled: true
-  version: '1.32.0'
+  version: '1.33.0'
   image: 'veertu/anka-build-cloud-etcd'
   volumeClaimUseLocalStorage: true
   volumeClaimName: 'etcd-data'
   volumeClaimCapacityStorageSize: 10Gi
-  ETCD_QUOTA_BACKEND_BYTES: '6294967296'
   # nodeAffinityKey: 'topology.kubernetes.io/zone'
   # nodeAffinityValue: 'us-west-2a'
