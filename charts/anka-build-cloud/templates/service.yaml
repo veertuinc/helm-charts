@@ -1,4 +1,4 @@
-{{ if .Values.controller.ingressALBHostname }}
+{{ if .Values.controller.enabled }}
 ---
 apiVersion: v1
 kind: Service
@@ -10,7 +10,25 @@ spec:
       port: 80
   selector:
     app: controller
-  type: NodePort
+  # type: NodePort ALB need this?
+{{ end }}
+
+{{ if .Values.registry.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry
+spec:
+  ports:
+    - name: registry
+      port: 8089
+  selector:
+    app: registry
+  # type: NodePort
+{{ end }}
+
+{{ if .Values.controller.ingressALBHostname }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -40,18 +58,6 @@ spec:
 {{ end }}
 ---
 {{ if .Values.registry.ingressALBHostname }}
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: registry
-spec:
-  ports:
-    - name: registry
-      port: 8089
-  selector:
-    app: registry
-  type: NodePort
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -94,4 +100,80 @@ spec:
     - protocol: TCP
       port: 2379
       targetPort: 2379
+{{ end }}
+
+{{ if .Values.controller.ingressNginxHostname }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: controller
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/auth-tls-secret: "{{ .Values.controller.ingressNginxAuthTLSSecretName }}"
+    nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "true"
+    nginx.ingress.kubernetes.io/auth-tls-verify-client: "optional"
+    nginx.ingress.kubernetes.io/client-max-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-max-temp-file-size: "0"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    external-dns.alpha.kubernetes.io/hostname: {{ .Values.controller.ingressNginxHostname }}
+spec:
+  ingressClassName: {{ .Values.controller.ingressNginxClassName }}
+  {{- if .Values.controller.ingressNginxTLSSecretName }}
+  tls:
+    - secretName: {{ .Values.controller.ingressNginxTLSSecretName }}
+      hosts:
+        - {{ .Values.controller.ingressNginxHostname }}
+  {{- end }}
+  rules:
+  - host: {{ .Values.controller.ingressNginxHostname }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: controller
+            port:
+              number: 80
+{{ end }}
+
+{{ if .Values.registry.ingressNginxHostname }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: registry
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    {{- if .Values.registry.ingressNginxAuthTLSSecretName }}
+    nginx.ingress.kubernetes.io/auth-tls-secret: "{{ .Values.registry.ingressNginxAuthTLSSecretName }}"
+    nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "true"
+    nginx.ingress.kubernetes.io/auth-tls-verify-client: "optional"
+    {{- end }}
+    nginx.ingress.kubernetes.io/client-max-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-max-temp-file-size: "0"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    external-dns.alpha.kubernetes.io/hostname: {{ .Values.registry.ingressNginxHostname }}
+spec:
+  ingressClassName: {{ .Values.registry.ingressNginxClassName }}
+  {{- if .Values.registry.ingressNginxTLSSecretName }}
+  tls:
+    - secretName: {{ .Values.registry.ingressNginxTLSSecretName }}
+      hosts:
+        - {{ .Values.registry.ingressNginxHostname }}
+  {{- end }}
+  rules:
+  - host: {{ .Values.registry.ingressNginxHostname }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: registry
+            port:
+              number: 8089
 {{ end }}
