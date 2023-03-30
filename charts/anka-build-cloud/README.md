@@ -37,10 +37,14 @@
         # Automatically create an AWS ALB requires Kubernetes cluster with AWS Load Balancer Controller: https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/
         # Comment out ingressALBHostname if you don't wish to set up the AWS ALB (you will need to deploy your own services)
         ingressALBHostname: controller.k8s.myDomain.com
-        # ===========================================
         # SG (ID or Name) must be inside of the VPC that's being used by the cluster
         # Comment out if you want to automatically create an SG for this ALB
         ingressALBSecurityGroup: default
+        # ===========================================
+        # Set up ingress using nginx
+        # ingressNginxHostname: controller.k8s.myDomain.com
+        # ingressNginxAuthTLSSecretName: anka-build-cloud/anka-build-cloud-ca-secret
+        # ingressNginxTLSSecretName: anka-build-cloud-cert
         # ===========================================
         env: |-
           # Find the complete list at https://docs.veertu.com/anka/anka-build-cloud/configuration-reference/#configuration-envs
@@ -56,7 +60,11 @@
         # ===========================================
         # volumeMounts: |
         #   - name: anka-build-cloud-tls
-        #     mountPath: /opt/anka_tls
+        #     mountPath: /mnt/anka-tls
+        # volumes: |-
+        #   - name: anka-tls
+        #     secret:
+        #       secretName: anka-build-cloud-cert
 
       registry:
         enabled: true
@@ -78,10 +86,14 @@
         # Automatically create an AWS ALB requires Kubernetes cluster with AWS Load Balancer Controller: https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/
         # Comment out ingressALBHostname if you don't wish to set up the AWS ALB (you will need to deploy your own services)
         ingressALBHostname: registry.k8s.myDomain.com
-        # ===========================================
         # SG (ID or Name) must be inside of the VPC that's being used by the cluster
         # Comment out if you want to automatically create an SG for this ALB
         ingressALBSecurityGroup: default
+        # ===========================================
+        # Set up ingress using nginx
+        # ingressNginxHostname: controller.k8s.myDomain.com
+        # ingressNginxAuthTLSSecretName: anka-build-cloud/anka-build-cloud-ca-secret
+        # ingressNginxTLSSecretName: anka-build-cloud-cert
         # ===========================================
         # env: |
           # Find the complete list at https://docs.veertu.com/anka/anka-build-cloud/configuration-reference/#configuration-envs
@@ -136,9 +148,9 @@
 
         helm delete veertu-helm-charts/anka-build-cloud
 
-4. Change your `controller.k8s.myDomain.com` and `controller.k8s.myDomain.com` to point to the ALB that was set up for each (AWS > EC2 > Target Groups).
+4. Change your `controller.k8s.myDomain.com` and `controller.k8s.myDomain.com` to point to the ingress endpoints that are set up for each (if using nginx, there will be one).
 
-5. Get pod health with `kubectl get pods --namespace anka-build-cloud`
+5. Get health with `kubectl --namespace anka-build-cloud get pod,ingress,svc`
 
 ### Using EFS
 

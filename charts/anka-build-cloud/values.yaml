@@ -8,6 +8,10 @@ controller:
   image: 'veertu/anka-build-cloud-controller'
   replicaCount: 2
   ingressALBHostname: false
+  ingressNginxHostname: false
+  ingressNginxClassName: nginx
+  ingressNginxTLSSecretName: false
+  ingressNginxAuthTLSSecretName: false
 
 registry:
   enabled: true
@@ -20,6 +24,10 @@ registry:
   volumeClaimName: 'registry-data'
   volumeClaimCapacityStorageSize: 200Gi
   ingressALBHostname: false
+  ingressNginxHostname: false
+  ingressNginxClassName: nginx
+  ingressNginxTLSSecretName: false
+  ingressNginxAuthTLSSecretName: false
 
 etcd:
   enabled: true

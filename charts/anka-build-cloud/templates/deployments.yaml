@@ -33,11 +33,17 @@ spec:
           {{- end }}
           {{- if .Values.controller.volumeMounts }}
           volumeMounts:
-          {{- range (splitList "\n" .Values.registry.volumeMounts) }}
+          {{- range (splitList "\n" .Values.controller.volumeMounts) }}
             {{ . }}
           {{- end }}
           {{- end }}
       restartPolicy: Always
+      {{- if .Values.controller.volumes }}
+      volumes:
+      {{- range (splitList "\n" .Values.controller.volumes) }}
+        {{ . }}
+      {{- end }}
+      {{- end }}
 {{ end }}
 ---
 {{ if .Values.registry.enabled }}
@@ -85,6 +91,11 @@ spec:
         - name: registry-data
           persistentVolumeClaim:
             claimName: {{ required ".registry.volumeClaimName value is required!" .Values.registry.volumeClaimName }}
+      {{- if .Values.registry.volumes }}
+      {{- range (splitList "\n" .Values.registry.volumes) }}
+        {{ . }}
+      {{- end }}
+      {{- end }}
 {{ end }}
 ---
 {{ if .Values.etcd.enabled }}
@@ -122,7 +133,7 @@ spec:
           volumeMounts:
             - mountPath: /etcd-data
               name: etcd-data
-          {{- if .Values.registry.volumeMounts }}
+          {{- if .Values.etcd.volumeMounts }}
           {{- range (splitList "\n" .Values.etcd.volumeMounts) }}
             {{ . }}
           {{- end }}
@@ -143,4 +154,9 @@ spec:
         - name: etcd-data
           persistentVolumeClaim:
             claimName: {{ required ".etcd.volumeClaimName value is required!" .Values.etcd.volumeClaimName }}
+      {{- if .Values.etcd.volumes }}
+      {{- range (splitList "\n" .Values.etcd.volumes) }}
+        {{ . }}
+      {{- end }}
+      {{- end }}
 {{ end }}
