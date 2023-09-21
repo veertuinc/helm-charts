@@ -30,7 +30,7 @@
 
       controller:
         enabled: true
-        version: '1.33.0'
+        version: '1.37.0'
         # image: 'veertu/anka-build-cloud-controller'
         replicaCount: 3
         # ===========================================
@@ -53,7 +53,7 @@
           - name: ANKA_ETCD_ENDPOINTS
             value: 'etcd-headless.anka-build-cloud.svc.cluster.local:2379'
             # if using bitnami helm chart: 'etcd-0.etcd-headless.anka-build-cloud.svc.cluster.local:2379,etcd-1.etcd-headless.anka-build-cloud.svc.cluster.local:2379,etcd-2.etcd-headless.anka-build-cloud.svc.cluster.local:2379'
-          - name: ANKA_LOCAL_ANKA_REGISTRY
+          - name: ANKA_LOCAL_ANKA_REGISTRY # REQUIRED / Must point to the 8089 port
             value: 'http://registry.anka-build-cloud.svc.cluster.local:8089'
           - name: ANKA_ENABLE_CENTRAL_LOGGING
             value: true
@@ -68,7 +68,7 @@
 
       registry:
         enabled: true
-        version: '1.33.0'
+        version: '1.37.0'
         # image: 'veertu/anka-build-cloud-registry'
         replicaCount: 1 # don't use more than 1 unless you have some sort of network storage that the entire cluster can access, no matter where the registry pods are.
         # ===========================================
@@ -95,11 +95,15 @@
         # ingressNginxAuthTLSSecretName: anka-build-cloud/anka-build-cloud-ca-secret
         # ingressNginxTLSSecretName: anka-build-cloud-cert
         # ===========================================
-        # env: |
+        env: |-
           # Find the complete list at https://docs.veertu.com/anka/anka-build-cloud/configuration-reference/#configuration-envs
+          - name: ANKA_LISTEN_ADDR
+            value: "0.0.0.0:8089"
+          - name: ANKA_BASE_PATH
+            value: "/mnt/vol"
 
       etcd:
-        version: '1.33.0'
+        version: '1.37.0'
         # #image: 'veertu/anka-build-cloud-etcd'
         #= Whether or not to run a single pod with etcd in it. Disable this if you are running an etcd cluster already.
         enabled: true
