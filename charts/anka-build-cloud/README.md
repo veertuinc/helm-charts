@@ -30,7 +30,7 @@
 
       controller:
         enabled: true
-        version: '1.37.0'
+        version: '1.38.0'
         # image: 'veertu/anka-build-cloud-controller'
         replicaCount: 3
         # ===========================================
@@ -68,7 +68,7 @@
 
       registry:
         enabled: true
-        version: '1.37.0'
+        version: '1.38.0'
         # image: 'veertu/anka-build-cloud-registry'
         replicaCount: 1 # don't use more than 1 unless you have some sort of network storage that the entire cluster can access, no matter where the registry pods are.
         # ===========================================
@@ -103,7 +103,7 @@
             value: "/mnt/vol"
 
       etcd:
-        version: '1.37.0'
+        version: '1.38.0'
         # #image: 'veertu/anka-build-cloud-etcd'
         #= Whether or not to run a single pod with etcd in it. Disable this if you are running an etcd cluster already.
         enabled: true
