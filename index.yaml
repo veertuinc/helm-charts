@@ -2,6 +2,29 @@ apiVersion: v1
 entries:
   anka-build-cloud:
   - apiVersion: v2
+    appVersion: 1.40.0
+    created: "2023-12-11T18:49:46.398037746Z"
+    description: A Helm chart for running the Anka Build Cloud Controller and Registry
+      on Kubernetes
+    digest: 93033b87d4ca1cd120226630be5c26e5bbe15356c590a0f49ac3bb35d0d5952f
+    home: https://veertu.com
+    icon: https://veertu.com/wp-content/uploads/2022/01/anka-monster-logo.png
+    keywords:
+    - virtualization
+    - macOS
+    - anka
+    - VMs
+    - mac
+    maintainers:
+    - email: support@veertu.com
+      name: Veertu Inc
+      url: https://veertu.com
+    name: anka-build-cloud
+    type: application
+    urls:
+    - https://github.com/veertuinc/helm-charts/releases/download/anka-build-cloud-0.5.2/anka-build-cloud-0.5.2.tgz
+    version: 0.5.2
+  - apiVersion: v2
     appVersion: 1.38.0
     created: "2023-10-24T19:50:43.926964625Z"
     description: A Helm chart for running the Anka Build Cloud Controller and Registry
@@ -185,4 +208,4 @@ entries:
     urls:
     - https://github.com/veertuinc/helm-charts/releases/download/anka-build-cloud-0.1.0/anka-build-cloud-0.1.0.tgz
     version: 0.1.0
-generated: "2023-10-24T19:50:43.926995226Z"
+generated: "2023-12-11T18:49:46.39807764Z"
