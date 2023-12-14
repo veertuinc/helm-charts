@@ -4,6 +4,7 @@
 
 - Our recommended (and default) approach is to use the [`aws-load-balancer-controller`](https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/deploy/installation/) to create a NodePort and then ALB in AWS with a specific hostname. Pods must also have IPs from the VPC subnets. We configure [`amazon-vpc-cni-k8s`](https://github.com/aws/amazon-vpc-cni-k8s) plugin for this purpose in our kops deployment.
 - By default local-storage is used for the Registry and ETCD. If the service pods are placed on a different kubernetes node, data will be orphaned on the previous and Anka VM Templates, Instances, etc will seem missing and be orphaned. This is not a good idea unless you only have a single node kubernetes cluster. For the registry: EFS is available as an alternative (see the comments below in the yaml and section "Using EFS") which can be cross-az. For ETCD, since it's sensitive to disk speed, you can set up a cluster with [Bitnami's ETCD Helm Chart](https://bitnami.com/stack/etcd/helm) which spans the entire cluster and prevents this.
+- The kubernetes ingress-nginx by default will have proxy-buffering and other configurations that can cause problems with large file transfers. We set several annotations like `nginx.ingress.kubernetes.io/proxy-buffering: "off"` to solve this in the Ingress service definitions for the registry, but you may need to set your own versions of these if not using `ingress-nginx` (which is often confused with `nginx-ingress-controller`).
 
 ## Usage
 
@@ -202,3 +203,9 @@ provisioner: efs.csi.aws.com
 EOF
 kubectl apply -f ./efs-storageclass.yaml
 ```
+
+---
+
+## ChangeLog
+
+- 0.6.0: Updated annotations for `nginx.ingress.kubernetes.io`` to support disabling buffering and large transfers.

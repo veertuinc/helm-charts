@@ -115,10 +115,10 @@ metadata:
     nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "true"
     nginx.ingress.kubernetes.io/auth-tls-verify-client: "optional"
     {{- end }}
-    nginx.ingress.kubernetes.io/client-max-body-size: "0"
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
     nginx.ingress.kubernetes.io/proxy-max-temp-file-size: "0"
     nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off" 
     external-dns.alpha.kubernetes.io/hostname: {{ .Values.controller.ingressNginxHostname }}
 spec:
   ingressClassName: {{ .Values.controller.ingressNginxClassName }}
@@ -154,10 +154,10 @@ metadata:
     nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "true"
     nginx.ingress.kubernetes.io/auth-tls-verify-client: "optional"
     {{- end }}
-    nginx.ingress.kubernetes.io/client-max-body-size: "0"
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
     nginx.ingress.kubernetes.io/proxy-max-temp-file-size: "0"
     nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off" 
     external-dns.alpha.kubernetes.io/hostname: {{ .Values.registry.ingressNginxHostname }}
 spec:
   ingressClassName: {{ .Values.registry.ingressNginxClassName }}
