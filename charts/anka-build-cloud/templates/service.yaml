@@ -110,7 +110,6 @@ metadata:
   name: controller
   annotations:
     {{- if .Values.registry.ingressNginxAuthTLSSecretName }}
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     nginx.ingress.kubernetes.io/auth-tls-secret: "{{ .Values.controller.ingressNginxAuthTLSSecretName }}"
     nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "true"
     nginx.ingress.kubernetes.io/auth-tls-verify-client: "optional"
@@ -149,7 +148,6 @@ metadata:
   name: registry
   annotations:
     {{- if .Values.registry.ingressNginxAuthTLSSecretName }}
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     nginx.ingress.kubernetes.io/auth-tls-secret: "{{ .Values.registry.ingressNginxAuthTLSSecretName }}"
     nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "true"
     nginx.ingress.kubernetes.io/auth-tls-verify-client: "optional"
