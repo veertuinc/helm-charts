@@ -208,4 +208,5 @@ kubectl apply -f ./efs-storageclass.yaml
 
 ## ChangeLog
 
+- 0.6.1: Removed `backend-protocol` as it is not used.
 - 0.6.0: Updated annotations for `nginx.ingress.kubernetes.io`` to support disabling buffering and large transfers.
