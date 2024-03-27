@@ -25,6 +25,14 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: 80
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 80
           {{- if .Values.controller.env }}
           env:
           {{- range (splitList "\n" .Values.controller.env) }}
@@ -72,6 +80,14 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8089
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: 8089
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8089
           {{- if .Values.registry.env }}
           env:
           {{- range (splitList "\n" .Values.registry.env) }}
