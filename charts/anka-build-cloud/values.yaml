@@ -4,7 +4,7 @@
 
 controller:
   enabled: true
-  version: '1.42.0'
+  version: '1.43.0'
   image: 'veertu/anka-build-cloud-controller'
   replicaCount: 2
   ingressALBHostname: false
@@ -15,7 +15,7 @@ controller:
 
 registry:
   enabled: true
-  version: '1.42.0'
+  version: '1.43.0'
   image: 'veertu/anka-build-cloud-registry'
   replicaCount: 1
   volumeClaimUseEFS: false
@@ -31,7 +31,7 @@ registry:
 
 etcd:
   enabled: true
-  version: '1.42.0'
+  version: '1.43.0'
   image: 'veertu/anka-build-cloud-etcd'
   volumeClaimUseLocalStorage: true
   volumeClaimName: 'etcd-data'
