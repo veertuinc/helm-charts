@@ -136,16 +136,63 @@ spec:
     spec:
       containers:
         - name: etcd
-          image: {{ .Values.etcd.image }}:v{{ .Values.etcd.version }}
+          image: {{ .Values.etcd.image }}:{{ .Values.etcd.version }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 2379
-        {{- if .Values.etcd.env }}
+            - containerPort: 2380
           env:
+            - name: ETCD_DATA_DIR
+              value: '/etcd-data'
+            - name: ETCD_LISTEN_CLIENT_URLS
+              value: 'http://0.0.0.0:2379'
+            - name: ETCD_ADVERTISE_CLIENT_URLS
+              value: 'http://0.0.0.0:2379'
+            - name: ETCD_LISTEN_PEER_URLS
+              value: 'http://0.0.0.0:2380'
+            - name: ETCD_INITIAL_ADVERTISE_PEER_URLS
+              value: 'http://0.0.0.0:2380'
+            - name: ETCD_INITIAL_CLUSTER
+              value: 'my-etcd=http://0.0.0.0:2380'
+            - name: ETCD_INITIAL_CLUSTER_TOKEN
+              value: 'my-etcd-token'
+            - name: ETCD_INITIAL_CLUSTER_STATE
+              value: 'new'
+            - name: ETCD_AUTO_COMPACTION_RETENTION
+              value: '30m'
+            - name: ETCD_AUTO_COMPACTION_MODE
+              value: 'periodic'
+            - name: ETCD_NAME
+              value: 'my-etcd'
+        {{- if .Values.etcd.env }}
           {{- range (splitList "\n" .Values.etcd.env) }}
             {{ . }}
           {{- end }}
         {{- end }}
+          livenessProbe:
+            exec:
+              command:
+                - etcdctl
+                - --endpoints=http://127.0.0.1:2379
+                - endpoint
+                - health
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            timeoutSeconds: 30
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - etcdctl
+                - --endpoints=http://127.0.0.1:2379
+                - endpoint
+                - health
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            timeoutSeconds: 30
+            successThreshold: 1
+            failureThreshold: 3
           volumeMounts:
             - mountPath: /etcd-data
               name: etcd-data
