@@ -136,35 +136,13 @@ spec:
     spec:
       containers:
         - name: etcd
-          image: {{ .Values.etcd.image }}:{{ .Values.etcd.version }}
+          image: {{ required ".etcd.image value is required!" .Values.etcd.image }}:{{ required ".etcd.version value is required!" .Values.etcd.version }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 2379
             - containerPort: 2380
-          env:
-            - name: ETCD_DATA_DIR
-              value: '/etcd-data'
-            - name: ETCD_LISTEN_CLIENT_URLS
-              value: 'http://0.0.0.0:2379'
-            - name: ETCD_ADVERTISE_CLIENT_URLS
-              value: 'http://0.0.0.0:2379'
-            - name: ETCD_LISTEN_PEER_URLS
-              value: 'http://0.0.0.0:2380'
-            - name: ETCD_INITIAL_ADVERTISE_PEER_URLS
-              value: 'http://0.0.0.0:2380'
-            - name: ETCD_INITIAL_CLUSTER
-              value: 'my-etcd=http://0.0.0.0:2380'
-            - name: ETCD_INITIAL_CLUSTER_TOKEN
-              value: 'my-etcd-token'
-            - name: ETCD_INITIAL_CLUSTER_STATE
-              value: 'new'
-            - name: ETCD_AUTO_COMPACTION_RETENTION
-              value: '30m'
-            - name: ETCD_AUTO_COMPACTION_MODE
-              value: 'periodic'
-            - name: ETCD_NAME
-              value: 'my-etcd'
         {{- if .Values.etcd.env }}
+          env:
           {{- range (splitList "\n" .Values.etcd.env) }}
             {{ . }}
           {{- end }}

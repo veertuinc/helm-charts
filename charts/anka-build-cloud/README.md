@@ -104,10 +104,11 @@
             value: "/mnt/vol"
 
       etcd:
-        version: '1.49.0'
-        # #image: 'veertu/anka-build-cloud-etcd'
         #= Whether or not to run a single pod with etcd in it. Disable this if you are running an etcd cluster already.
         enabled: true
+        #= Using the public CoreOS etcd image (required)
+        version: 'v3.5.25'
+        image: 'quay.io/coreos/etcd'
         volumeClaimUseLocalStorage: true
         volumeClaimName: 'etcd-data'
         volumeClaimCapacityStorageSize: 10Gi
