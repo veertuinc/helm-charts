@@ -31,7 +31,7 @@
 
       controller:
         enabled: true
-        version: '1.51.2'
+        version: '1.52.0-36aa9fba'
         # image: 'veertu/anka-build-cloud-controller'
         replicaCount: 3
         # ===========================================
@@ -69,7 +69,7 @@
 
       registry:
         enabled: true
-        version: '1.51.2'
+        version: '1.52.0-36aa9fba'
         # image: 'veertu/anka-build-cloud-registry'
         replicaCount: 1 # don't use more than 1 unless you have some sort of network storage that the entire cluster can access, no matter where the registry pods are.
         # ===========================================

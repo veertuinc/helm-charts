@@ -1,8 +1,8 @@
 type: application
-version: 1.51.2
+version: 1.52.0-36aa9fba
 apiVersion: v2
 name: anka-build-cloud
-appVersion: "1.51.2"
+appVersion: "1.52.0-36aa9fba"
 description: A Helm chart for running the Anka Build Cloud Controller and Registry on Kubernetes
 home: https://veertu.com
 keywords:
