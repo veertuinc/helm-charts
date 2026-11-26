@@ -4,7 +4,7 @@
 
 controller:
   enabled: true
-  version: '1.52.1-72c29153'
+  version: '1.52.2-4c2e03d0'
   image: 'veertu/anka-build-cloud-controller'
   replicaCount: 2
   ingressALBHostname: false
@@ -15,7 +15,7 @@ controller:
 
 registry:
   enabled: true
-  version: '1.52.1-72c29153'
+  version: '1.52.2-4c2e03d0'
   image: 'veertu/anka-build-cloud-registry'
   replicaCount: 1
   volumeClaimUseEFS: false
